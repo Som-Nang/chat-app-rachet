@@ -3,6 +3,7 @@
 class ChatUser
 {
     private $user_id;
+    private $teacherID;
     public $dbh;
 
     public function __construct()
@@ -20,9 +21,19 @@ class ChatUser
         $this->user_id = $user_id;
     }
 
-    function getUseruser_id()
+    function getUser()
     {
         return $this->user_id;
+    }
+
+    function setTeacherId($teacherID)
+    {
+        $this->teacherID = $teacherID;
+    }
+
+    function getTeacher_id()
+    {
+        return $this->teacherID;
     }
 
     function get_user_data_by_email()
@@ -77,5 +88,28 @@ class ChatUser
         $data = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         return $data;
+    }
+
+    // TEACHER
+    function get_teacher_data_by_id()
+    {
+        $query = "
+		SELECT * FROM tblteacher 
+		WHERE ID = :teacherID";
+
+        $statement = $this->dbh->prepare($query);
+
+        $statement->bindParam(':teacherID', $this->teacherID);
+
+        try {
+            if ($statement->execute()) {
+                $teacherID = $statement->fetch(PDO::FETCH_ASSOC);
+            } else {
+                $teacherID = array();
+            }
+        } catch (Exception $error) {
+            echo $error->getMessage();
+        }
+        return $teacherID;
     }
 }

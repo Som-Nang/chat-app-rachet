@@ -6,8 +6,11 @@ try {
     // include('dbconnection.php');
     require('data/ChatRooms.php');
 
-    $_SESSION['user_data'] = '79';
+    $_SESSION['user_data'] = '';
+    $_SESSION['teacher_data'] = '10';
     $userID = $_SESSION['user_data'];
+    $teacherID = $_SESSION['teacher_data'];
+
 
     $chat_object = new ChatRooms;
 
@@ -40,13 +43,24 @@ try {
                 <?php
 
                 foreach ($chat_data as $chat) {
-                    if ($_SESSION['user_data'] == $chat['from_uid']) {
-                        $from = 'Me';
-                        $row_class = 'msg right-msg';
-                    } else {
-                        $from = $chat['FullName'];
-                        $row_class = 'msg left-msg';
+                    if (isset($_SESSION['user_data']) && !empty($_SESSION['user_data'])) {
+                        if ($_SESSION['user_data'] == $chat['from_uid']) {
+                            $from = 'Me';
+                            $row_class = 'msg right-msg';
+                        } else {
+                            $from = ($chat['FullName']  ? $chat['FullName'] : $chat['FirstName']);
+                            $row_class = 'msg left-msg';
+                        }
+                    } else if (isset($_SESSION['teacher_data']) && !empty($_SESSION['teacher_data'])) {
+                        if ($_SESSION['teacher_data'] == $chat['from_tid']) {
+                            $from = 'Me';
+                            $row_class = 'msg right-msg';
+                        } else {
+                            $from = ($chat['FullName']);
+                            $row_class = 'msg left-msg';
+                        }
                     }
+
 
 
                     echo '
@@ -114,12 +128,20 @@ try {
                 event.preventDefault();
 
                 if ($('#chat_form').parsley().isValid()) {
-
-                    var user_id = '<?php echo $userID ?>';
                     var message = $('#chat_message').val();
+                    var user_id = null;
+                    var teacherID = null;
+                    <?php if (!empty($teacherID)) : ?>
+                        teacherID = <?php echo json_encode($teacherID); ?>;
+                    <?php endif; ?>
+                    <?php if (!empty($userID)) : ?>
+                        user_id = <?php echo json_encode($userID); ?>;
+                    <?php endif; ?>
+
 
                     var data = {
                         userId: user_id,
+                        teacherID: teacherID,
                         msg: message,
                         subject_id: 148,
                         group_id: 173,

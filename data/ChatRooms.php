@@ -7,6 +7,7 @@ try {
 
         private $chat_id;
         private $from_uid;
+        private $from_tid;
         private $message;
         private $created_at;
         private $subject_id;
@@ -31,6 +32,16 @@ try {
         function getUserId()
         {
             return $this->from_uid;
+        }
+
+        function getTeacherId()
+        {
+            return $this->from_tid;
+        }
+
+        function setTeacherId($from_tid)
+        {
+            $this->from_tid = $from_tid;
         }
 
         function setMessage($message)
@@ -84,13 +95,15 @@ try {
         {
             $query = "
 		INSERT INTO chats 
-			(from_uid, message,subject_id, group_id, created_at) 
-			VALUES (:from_uid, :message,:subject_id, :group_id, :created_at)
+			(from_uid, from_tid, message,subject_id, group_id, created_at) 
+			VALUES (:from_uid, :from_tid, :message,:subject_id, :group_id, :created_at)
 		";
 
             $statement = $this->dbh->prepare($query);
 
             $statement->bindParam(':from_uid', $this->from_uid);
+
+            $statement->bindParam(':from_tid', $this->from_tid);
 
             $statement->bindParam(':message', $this->message);
 
@@ -115,21 +128,37 @@ try {
 
             $testSubject = '148';
             $testGroup = '173';
-            $_SESSION['user_id'] = '79';
+            $_SESSION['user_id'] = '78';
+
             $query = "
-            SELECT DISTINCT chats.chat_id, chats.message, chats.from_uid, chats.subject_id, chats.group_id,
-            chats.created_at, tbluser.*
-            FROM chats
-			INNER JOIN tbluser 
-			ON tbluser.ID = chats.from_uid
-            INNER JOIN tblsubject 
-			ON tblsubject.ID = chats.subject_id
-            INNER JOIN tblgroup 
-			ON tblgroup.group_id = chats.group_id
-            LEFT JOIN tblgroup_member ON tblgroup_member.group_id = tblgroup.group_id
-            WHERE tblgroup_member.user_id = :testUser AND tblgroup.group_id = :testGroup AND tblsubject.ID = :testSubject
-			ORDER BY chats.chat_id ASC
-		";
+            SELECT DISTINCT 
+            chats.chat_id,
+            chats.from_tid,
+            chats.message,
+            chats.from_uid,
+            chats.subject_id,
+            chats.group_id,
+            chats.created_at,
+            tblteacher.FirstName,
+            tblteacher.LastName,
+            tbluser.*
+        FROM chats
+        INNER JOIN tblsubject ON tblsubject.ID = chats.subject_id
+        INNER JOIN tblgroup ON tblgroup.group_id = chats.group_id
+        LEFT JOIN tbluser ON tbluser.ID = chats.from_uid
+        LEFT JOIN tblgroup_member ON tblgroup_member.group_id = tblgroup.group_id
+        LEFT JOIN tblclass ON tblclass.ID = tblgroup.class_id
+        LEFT JOIN tbl_classdetail ON tbl_classdetail.classID = tblclass.ID
+        LEFT JOIN tblteacher ON tblteacher.ID = chats.from_tid 
+        WHERE 
+            ( 
+                (chats.from_uid IS NOT NULL AND tblgroup_member.user_id = :testUser) OR 
+                (chats.from_tid IS NOT NULL AND tbl_classdetail.teacherID = tblteacher.ID)
+            )
+            AND tblgroup.group_id = :testGroup 
+            AND tblsubject.ID = :testSubject
+        ORDER BY chats.chat_id ASC";
+
 
             $statement = $this->dbh->prepare($query);
             $statement->bindParam(':testGroup', $testGroup);

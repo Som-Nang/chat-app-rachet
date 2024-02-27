@@ -43,6 +43,8 @@ class Chat implements MessageComponentInterface
 
         $chat_object->setUserId($data['userId']);
 
+        $chat_object->setTeacherId($data['teacherID']);
+
         $chat_object->setMessage($data['msg']);
 
         $chat_object->setSubject($data['subject_id']);
@@ -55,12 +57,17 @@ class Chat implements MessageComponentInterface
 
         $user_object = new \ChatUser;
 
-        $user_object->setUserId($data['userId']);
+        if ($data['userId'] != '') {
+            $user_object->setUserId($data['userId']);
+            $user_data = $user_object->get_user_data_by_id();
+            $user_name = $user_data['FullName'];
+        } else {
+            $user_object->setTeacherId($data['teacherID']);
+            $user_data = $user_object->get_teacher_data_by_id();
+            $user_name = $user_data['FirstName'];
+        }
 
-        $user_data = $user_object->get_user_data_by_id();
-
-        $user_name = $user_data['FullName'];
-
+        print_r($user_name);
         $data['dt'] = date("d-m-Y h:i:s");
 
 
@@ -73,7 +80,7 @@ class Chat implements MessageComponentInterface
             if ($from == $client) {
                 $data['from'] = 'Me';
             } else {
-                $data['from'] = $user_name;
+                $data['from'] = ($user_name);
             }
 
             $client->send(json_encode($data));
