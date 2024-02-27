@@ -178,7 +178,7 @@ try {
                     var data = {
                         userId: user_id,
                         msg: message,
-                        subject_id: 143,
+                        subject_id: 148,
                         group_id: 173,
                     };
 
