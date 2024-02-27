@@ -5,7 +5,8 @@ namespace MyApp;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-require dirname(__DIR__) . "/ChatRooms.php";
+require dirname(__DIR__) . "/data/ChatRooms.php";
+require dirname(__DIR__) . "/data/ChatUsers.php";
 class Chat implements MessageComponentInterface
 {
     protected $clients;
@@ -52,7 +53,16 @@ class Chat implements MessageComponentInterface
 
         $chat_object->save_chat();
 
+        $user_object = new \ChatUser;
+
+        $user_object->setUserId($data['userId']);
+
+        $user_data = $user_object->get_user_data_by_id();
+
+        $user_name = $user_data['FullName'];
+
         $data['dt'] = date("d-m-Y h:i:s");
+
 
         foreach ($this->clients as $client) {
             /*if ($from !== $client) {
@@ -63,7 +73,7 @@ class Chat implements MessageComponentInterface
             if ($from == $client) {
                 $data['from'] = 'Me';
             } else {
-                $data['from'] = '78';
+                $data['from'] = $user_name;
             }
 
             $client->send(json_encode($data));

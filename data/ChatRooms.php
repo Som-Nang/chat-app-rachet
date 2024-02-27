@@ -115,21 +115,26 @@ try {
 
             $testSubject = '148';
             $testGroup = '173';
+            $_SESSION['user_id'] = '79';
             $query = "
-		SELECT * FROM chats 
+            SELECT DISTINCT chats.chat_id, chats.message, chats.from_uid, chats.subject_id, chats.group_id,
+            chats.created_at, tbluser.*
+            FROM chats
 			INNER JOIN tbluser 
 			ON tbluser.ID = chats.from_uid
             INNER JOIN tblsubject 
 			ON tblsubject.ID = chats.subject_id
             INNER JOIN tblgroup 
 			ON tblgroup.group_id = chats.group_id
-            WHERE tblgroup.group_id = :testGroup AND tblsubject.ID = :testSubject
+            LEFT JOIN tblgroup_member ON tblgroup_member.group_id = tblgroup.group_id
+            WHERE tblgroup_member.user_id = :testUser AND tblgroup.group_id = :testGroup AND tblsubject.ID = :testSubject
 			ORDER BY chats.chat_id ASC
 		";
 
             $statement = $this->dbh->prepare($query);
             $statement->bindParam(':testGroup', $testGroup);
             $statement->bindParam(':testSubject', $testSubject);
+            $statement->bindParam(':testUser', $_SESSION['user_id']);
             $statement->execute();
 
             return $statement->fetchAll(PDO::FETCH_ASSOC);

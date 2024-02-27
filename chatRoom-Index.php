@@ -4,8 +4,8 @@ try {
     ini_set('display_errors', 1);
     session_start();
     // include('dbconnection.php');
-    require('ChatRooms.php');
-    $_SESSION['user_data'] = '78';
+    require('data/ChatRooms.php');
+    $_SESSION['user_data'] = '79';
     $userID = $_SESSION['user_data'];
 
     $chat_object = new ChatRooms;
@@ -85,29 +85,29 @@ try {
                             <?php
 
                             foreach ($chat_data as $chat) {
-                                if (isset($_SESSION['user_data'][$chat['from_uid']])) {
+                                if ($_SESSION['user_data'] == $chat['from_uid']) {
                                     $from = 'Me';
-                                    $row_class = 'row justify-content-start';
+                                    $row_class = 'row justify-content-end';
                                     $background_class = 'text-dark alert-light';
                                 } else {
                                     $from = $chat['FullName'];
-                                    $row_class = 'row justify-content-end';
+                                    $row_class = 'row justify-content-start';
                                     $background_class = 'alert-success';
                                 }
 
                                 echo '
-						<div class="' . $row_class . '">
-							<div class="col-sm-10">
-								<div class="shadow-sm alert ' . $background_class . '">
-									<b>' . $from . ' - </b>' . $chat["message"] . '
-									<br />
-									<div class="text-right">
-										<small><i>' . $chat["created_at"] . '</i></small>
-									</div>
-								</div>
-							</div>
-						</div>
-						';
+                                    <div class="' . $row_class . '">
+                                        <div class="col-sm-10">
+                                            <div class="shadow-sm alert ' . $background_class . '">
+                                                <b>' . $from . ' - </b>' . $chat["message"] . '
+                                                <br />
+                                                <div class="text-right">
+                                                    <small><i>' . $chat["created_at"] . '</i></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    ';
                             }
                             ?>
                         </div>
@@ -115,7 +115,7 @@ try {
 
                         <form method="post" id="chat_form" data-parsley-errors-container="#validation_error">
                             <div class="input-group mb-3">
-                                <textarea class="form-control" id="chat_message" name="chat_message" placeholder="Type Message Here" data-parsley-maxlength="1000" data-parsley-pattern="/^[a-zA-Z0-9\s]+$/" required></textarea>
+                                <input type="text" class="form-control" id="chat_message" name="chat_message" placeholder="Type Message Here" data-parsley-maxlength="1000" data-parsley-pattern="/^[a-zA-Z0-9\s]+$/" required />
                                 <div class="input-group-append">
                                     <button type="submit" name="send" id="send" class="btn btn-primary">Send</button>
                                 </div>
@@ -149,10 +149,10 @@ try {
                 var background_class = '';
 
                 if (data.from == 'Me') {
-                    row_class = 'row justify-content-start';
+                    row_class = 'row justify-content-end';
                     background_class = 'text-dark alert-light';
                 } else {
-                    row_class = 'row justify-content-end';
+                    row_class = 'row justify-content-start';
                     background_class = 'alert-success';
                 }
 
