@@ -6,8 +6,8 @@ try {
     // include('dbconnection.php');
     require('data/ChatRooms.php');
 
-    $_SESSION['user_data'] = '';
-    $_SESSION['teacher_data'] = '10';
+    $_SESSION['user_data'] = '78';
+    $_SESSION['teacher_data'] = '';
     $userID = $_SESSION['user_data'];
     $teacherID = $_SESSION['teacher_data'];
 
@@ -24,7 +24,6 @@ try {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
         <link rel="stylesheet" href="style.css">
         <title>Chat application </title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -149,7 +148,6 @@ try {
 
                     conn.send(JSON.stringify(data));
                     $('#messages_area').scrollTop($('#messages_area')[0].scrollHeight);
-                    console.log("console data " + data);
 
                 }
 
